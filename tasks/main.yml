@@ -1,0 +1,36 @@
+---
+- include: Debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: Download go source
+  command: hg clone -u release {{go_base_url}} chdir=/tmp creates=/tmp/go
+
+- name: Update release branch
+  command: hg pull chdir=/tmp/go
+
+#- name: Switch release branch to {{go_version}}
+#  command: hg update {{go_version_tag}} chdir=/tmp/go c={{go_binary_path}}/{{go_version_tag}}
+
+- name: Compile {{go_version_tag}}
+  command: ./all.bash chdir=/tmp/go/src creates={{go_path}}/{{go_version_tag}}
+
+- name: Copy {{go_version_tag}} binaries
+  command: cp /tmp/go/bin/{{item}} {{go_path}}/{{item}}{{go_version}} creates={{go_path}}/{{item}}{{go_version}}
+  with_items:
+    - go
+    - gofmt
+
+- name: Set {{go_version_tag}} as default
+  file: src={{go_path}}/{{item}}{{go_version}} dest={{go_path}}/{{item}} state=link
+  with_items:
+    - go
+    - gofmt
+
+- name: Add {{go_version_tag}} to PATH environment variable for all users
+  template: src=go.sh.j2 dest=/etc/profile.d/go.sh
+
+- name: Install Tools 
+  command: 'go get {{go_tools_url}}{{item.tool}}'
+  with_items: go_tools
+
+

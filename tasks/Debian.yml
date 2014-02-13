@@ -1,0 +1,32 @@
+---
+- name: Install os packages
+  apt: pkg={{item}} state=present update_cache=yes
+  with_items: 
+    - build-essential
+    - gcc 
+    - libc6-dev
+    - mercurial
+
+- name: Configure CAs pt. 1
+  lineinfile:
+    dest=/etc/mercurial/hgrc
+    line='{{item}}'
+    regexp='^\[web\]'
+    state=present
+    insertafter=EOF
+    create=True
+  with_items:
+    - '[web]'
+  sudo: yes
+
+- name: Configure CAs pt. 2
+  lineinfile:
+    dest=/etc/mercurial/hgrc
+    line='{{item}}'
+    regexp='^{{item}}'
+    state=present
+    insertafter=EOF
+    create=True
+  with_items:
+    - 'cacerts = /etc/ssl/certs/ca-certificates.crt'
+  sudo: yes

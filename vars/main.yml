@@ -1,0 +1,6 @@
+---
+go_playbook_version: "0.1.0"
+go_version: "1.2"
+go_version_tag: "go{{go_version}}"
+go_base_url: "https://code.google.com/p/go"
+go_path: "/opt/go"

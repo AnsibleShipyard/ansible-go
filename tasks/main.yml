@@ -8,8 +8,8 @@
 - name: Update release branch
   command: hg pull chdir=/tmp/go
 
-#- name: Switch release branch to {{go_version}}
-#  command: hg update {{go_version_tag}} chdir=/tmp/go c={{go_binary_path}}/{{go_version_tag}}
+- name: Switch release branch to {{go_version}}
+  command: hg update {{go_version_tag}} chdir=/tmp/go creates={{go_path}}/{{go_version_tag}}
 
 - name: Compile {{go_version_tag}}
   command: ./all.bash chdir=/tmp/go/src creates={{go_path}}/{{go_version_tag}}
@@ -28,9 +28,5 @@
 
 - name: Add {{go_version_tag}} to PATH environment variable for all users
   template: src=go.sh.j2 dest=/etc/profile.d/go.sh
-
-- name: Install Tools 
-  command: 'go get {{go_tools_url}}{{item.tool}}'
-  with_items: go_tools
 
 
